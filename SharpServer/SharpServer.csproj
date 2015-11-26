@@ -36,7 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffers\BufferStream.cs" />
-    <Compile Include="Buffers\ByteBuffer.cs" />
     <Compile Include="Buffers\PacketStream.cs" />
     <Compile Include="Exceptions\SocketExceptions.cs" />
     <Compile Include="Servicers\IPServer.cs" />

@@ -22,7 +22,6 @@ namespace SharpServer.Buffers {
 
     /// <summary>Provides a stream designed for reading TCP packets and UDP datagrams by type.</summary>
     public class BufferStream {
-        private BufferType lastType = BufferType.None;
         private const byte bTrue = 1, bFalse = 0;
         private int fastAlign, fastAlignNot;
         private int iterator, length, alignment;
@@ -40,7 +39,7 @@ namespace SharpServer.Buffers {
             fastAlignNot = ~fastAlign;
             this.length = length;
             this.alignment = alignment;
-            memory = new byte[ /*AlignedIterator( length, alignment )*/ length ];
+            memory = new byte[ AlignedIterator( length, alignment ) ];
             iterator = 0;
         }
 
@@ -194,7 +193,6 @@ namespace SharpServer.Buffers {
             memory[ iterator++ ] = (byte)( value >> 16 );
             memory[ iterator ] = (byte)( value >> 24 );
             iterator = ( iterator + fastAlign ) & fastAlignNot;
-            lastType = BufferType.Int32;
         }
 
         /// <summary>Writes a value of the specified type to this buffer.</summary>
