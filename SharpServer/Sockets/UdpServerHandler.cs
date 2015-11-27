@@ -5,24 +5,75 @@ using SharpServer.Buffers;
 using SharpServer.Exceptions;
 
 namespace SharpServer.Sockets {
+    /// <summary>
+    /// Provides an interface for handling a UDP server and receiving datagrams.
+    /// </summary>
     public class UdpServerHandler : SocketContainer {
-        public UdpClient Listener { get; private set; }
-        public int Port { get; set; }
-        public bool Status { get; set; }
-        public int Alignment { get; private set; }
-        
         private bool running;
+        /// <summary>
+        /// Get if the server is running/processing.
+        /// </summary>
         public bool IsRunning { get { return running; } }
+        /// <summary>
+        /// Underlying UDP socket listener to send/receive on.
+        /// </summary>
+        public UdpClient Listener { get; private set; }
+        /// <summary>
+        /// Port to receive on.
+        /// </summary>
+        public int Port { get; set; }
+        /// <summary>
+        /// Pre-defined header that can be written to packets for verification between client and server.
+        /// </summary>
+        public byte[] PacketHeader { get; private set; }
+        /// <summary>
+        /// Default alignment for receive buffers of the server.
+        /// </summary>
+        public int Alignment { get; private set; }
+        /// <summary>
+        /// Status (online = true/offline = false) of the UDP server.
+        /// </summary>
+        public bool Status { get; set; }
 
-		public delegate void StartedEventDelegate( UdpServerHandler receiver );
-		public delegate void ReceivedEventDelegate( UdpServerHandler receiver, BufferStream readBuffer, IPEndPoint endPoint );
-		public delegate void ClosedEventDelegate( UdpServerHandler receiver );
-		public event StartedEventDelegate StartedDelegate;
+        /// <summary>
+        /// Event handler for the UDP server started event.
+        /// </summary>
+        /// <param name="receiver">UDP server that threw the event.</param>
+		public delegate void StartedEventDelegate( UdpServerHandler server );
+        /// <summary>
+        /// Event handler for the UDP server datagram received event.
+        /// </summary>
+        /// <param name="receiver">UDP server that threw the event.</param>
+        /// <param name="readBuffer">BufferStream with the received datagram.</param>
+        /// <param name="endPoint">IP and Port information of the sender.</param>
+		public delegate void ReceivedEventDelegate( UdpServerHandler server, BufferStream readBuffer, IPEndPoint endPoint );
+		/// <summary>
+		/// Event handler for the UDP server closed event.
+		/// </summary>
+		/// <param name="receiver">UDP server that threw the event.</param>
+        public delegate void ClosedEventDelegate( UdpServerHandler server );
+		/// <summary>
+		/// Event thrown when the UDP server is started.
+		/// </summary>
+        public event StartedEventDelegate StartedDelegate;
+        /// <summary>
+        /// Event thrown when the UDP server receives a datagram.
+        /// </summary>
 		public event ReceivedEventDelegate ReceivedDelegate;
+        /// <summary>
+        /// Event thrown when the UDP server closes.
+        /// </summary>
 		public event ClosedEventDelegate ClosedDelegate;
 		
-        public UdpServerHandler( SocketBinder binder, int port, int alignment ) : base( binder ) {
-			Port = port;
+        /// <summary>
+        /// Instantiates an instances of the UdpServerHandler class using the specified SocketBinder and parameters.
+        /// </summary>
+        /// <param name="binder">SocketBinder to bind a new socket too.</param>
+        /// <param name="port">Port used for receiving.</param>
+        /// <param name="alignment">Default alignment in bytes for buffers.</param>
+        /// <param name="packetHeader">Collection of bytes used for packet verification.</param>
+        public UdpServerHandler( SocketBinder binder, int port, int alignment, byte[] packetHeader ) : base( binder ) {
+            Port = port;
             Alignment = ( alignment > 0 ) ? alignment : 1;
             running = false;
 
@@ -31,14 +82,22 @@ namespace SharpServer.Sockets {
 			Listener.AllowNatTraversal( true );
 		}
 
+        /// <summary>
+        /// Starts running the UDP server if it is NOT already running.
+        /// </summary>
+        /// <returns>Returns true if the server has started, false if the server is already running.</returns>
+        /// <exception cref="SharpServer.Exceptions.StartedBeforeSetupException"/>
 		public bool Start() {
-            if ( Listener == null ) throw new ServerStartedBeforeSetupException( "UDP server started before initialization." );
+            if ( Listener == null ) throw new StartedBeforeSetupException( "UDP server started before initialization." );
             if ( running ) return !running;
             Status = true;
             ThreadPool.QueueUserWorkItem( thread => Handle() );
             return !running;
 		}
 
+        /// <summary>
+        /// Closes, resets and restarts the UDP server.
+        /// </summary>
         public void Restart() {
             Close();
 			Listener = new UdpClient( Port );
@@ -49,6 +108,9 @@ namespace SharpServer.Sockets {
             Start();
         }
 
+        /// <summary>
+        /// Handles incoming datagrams.
+        /// </summary>
 		private void Handle() {
 			running = true;
             StartedDelegate( this );
@@ -71,6 +133,9 @@ namespace SharpServer.Sockets {
 			Close();
 		}
 
+        /// <summary>
+        /// Closes the UDP server and unbinds it's socket.
+        /// </summary>
 		private void Close() {
 			if ( IsBound ) {
                 Unbind();
@@ -80,8 +145,13 @@ namespace SharpServer.Sockets {
                 Listener.Close();
                 Listener = null;
             }
+
+            System.GC.SuppressFinalize( this );
 		}
 
+        /// <summary>
+        /// Cleans up and closes the UDP server if it hasn't been done already.
+        /// </summary>
 		~UdpServerHandler() {
             Close();
 		}

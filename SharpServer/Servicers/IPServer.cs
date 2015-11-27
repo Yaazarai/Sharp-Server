@@ -3,10 +3,16 @@ using System.Text.RegularExpressions;
 using Uri = System.Uri;
 
 namespace SharpServer.Services {
+    /// <summary>
+    /// Enumerator that represents the different support web IP APIs.
+    /// </summary>
     public enum IPAPI {
         IPIfy, IPInfo, IPAPI, CheckIPDyDNS
     }
 
+    /// <summary>
+    /// Provides an interface for prompting web IP APIs for IP address info.
+    /// </summary>
     public class IPServicer {
         private const string webIPify = "https://api.ipify.org";
         private const string webIPInfo = "http://ipinfo.io/ip";

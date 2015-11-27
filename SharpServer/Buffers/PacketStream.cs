@@ -3,9 +3,13 @@ using System.Net.Sockets;
 using SharpServer.Sockets;
 
 namespace SharpServer.Buffers {
-    /// <summary>Provides an interface for sending packets to a TCP client.</summary>
+    /// <summary>
+    /// Provides an interface for sending packets to a TCP client.
+    /// </summary>
     public static class PacketStream {
-	    /// <summary>Asynchronously sends a buffer(packet) through the specified stream.</summary>
+	    /// <summary>
+        /// Asynchronously sends a buffer(packet) through the specified stream.
+        /// </summary>
 	    /// <param name="stream">The particular stream of a TCP client to send through.</param>
 	    /// <param name="buffer">Buffer containing the packet to be sent.</param>
         /// <exception cref="System.ArugmentNullException"/>
@@ -17,7 +21,9 @@ namespace SharpServer.Buffers {
 			await stream.FlushAsync();
 		}
 
-	    /// <summary>Synchronously sends a buffer(packet) through the specified stream.</summary>
+	    /// <summary>
+        /// Synchronously sends a buffer(packet) through the specified stream.
+        /// </summary>
 	    /// <param name="stream">The particular stream of a TCP client to send through.</param>
 	    /// <param name="buffer">Buffer containing the packet to be sent.</param>
         /// <exception cref="System.ArugmentNullException"/>
@@ -30,9 +36,13 @@ namespace SharpServer.Buffers {
 		}
     }
 
-    /// <summary>Provides an interface for sending datagrams to a specified IP and port.</summary>
+    /// <summary>
+    /// Provides an interface for sending datagrams to a specified IP and port.
+    /// </summary>
     public static class DatagramStream {
-        /// <summary>Asynchronously sends a buffer(datagram) through the specified UDP client.</summary>
+        /// <summary>
+        /// Asynchronously sends a buffer(datagram) through the specified UDP client.
+        /// </summary>
         /// <param name="client">UDP client to send the datagram through.</param>
         /// <param name="buffer">Buffer that contains the datagram to be sent.</param>
         /// <param name="endPoint">IPEndpoint(address/port) to send the datagram too.</param>
@@ -44,7 +54,9 @@ namespace SharpServer.Buffers {
             await client.SendAsync( buffer.Memory, buffer.Iterator, endPoint );
 		}
 
-        /// <summary>Synchonously sends a buffer(datagram) through the specified UDP client.</summary>
+        /// <summary>
+        /// Synchonously sends a buffer(datagram) through the specified UDP client.
+        /// </summary>
         /// <param name="client">UDP client to send the datagram through.</param>
         /// <param name="buffer">Buffer that contains the datagram to be sent.</param>
         /// <param name="endPoint">IPEndpoint(address/port) to send the datagram too.</param>
