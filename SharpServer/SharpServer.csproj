@@ -46,7 +46,6 @@
     <Compile Include="Sockets\TcpServerHandler.cs" />
     <Compile Include="Sockets\TcpClientHandler.cs" />
     <Compile Include="Sockets\SocketBinder.cs" />
-    <Compile Include="Source.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
