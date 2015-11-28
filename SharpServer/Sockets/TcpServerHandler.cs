@@ -25,10 +25,6 @@ namespace SharpServer.Sockets {
         /// </summary>
         public int MaxConnections { get; private set; }
         /// <summary>
-        /// Pre-defined header that can be written to packets for verification between client and server.
-        /// </summary>
-        public byte[] PacketHeader { get; private set; }
-        /// <summary>
         /// Default alignment for receive buffers.
         /// </summary>
         public int Alignment { get; private set; }
@@ -102,7 +98,7 @@ namespace SharpServer.Sockets {
         /// <param name="alignment">Default alignment for receive buffers.</param>
         /// <param name="packetHeader">Collection of bytes used for packet verification.</param>
         /// <param name="ip">IP address to listen on--or NULL to listen on all available IP addresses on this device.</param>
-        public TcpServerHandler( SocketBinder binder, int port, int maxConnections, int alignment, byte[] packetHeader, IPAddress ip = null ) : base( binder ) {
+        public TcpServerHandler( SocketBinder binder, int port, int maxConnections, int alignment, IPAddress ip = null ) : base( binder ) {
             if ( maxConnections > 0 ) {
                 MaxConnections = maxConnections;
                 ClientMap = new Dictionary<int,TcpClientHandler>( maxConnections );
@@ -113,7 +109,6 @@ namespace SharpServer.Sockets {
 
             Port = port;
             Alignment = alignment;
-            PacketHeader = packetHeader;
 
             BeginSetup( port, ip );
         }

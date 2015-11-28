@@ -23,10 +23,6 @@ namespace SharpServer.Sockets {
         /// </summary>
         public int Port { get; set; }
         /// <summary>
-        /// Pre-defined header that can be written to packets for verification between client and server.
-        /// </summary>
-        public byte[] PacketHeader { get; private set; }
-        /// <summary>
         /// Default alignment for receive buffers of the server.
         /// </summary>
         public int Alignment { get; private set; }
@@ -72,7 +68,7 @@ namespace SharpServer.Sockets {
         /// <param name="port">Port used for receiving.</param>
         /// <param name="alignment">Default alignment in bytes for buffers.</param>
         /// <param name="packetHeader">Collection of bytes used for packet verification.</param>
-        public UdpServerHandler( SocketBinder binder, int port, int alignment, byte[] packetHeader ) : base( binder ) {
+        public UdpServerHandler( SocketBinder binder, int port, int alignment ) : base( binder ) {
             Port = port;
             Alignment = ( alignment > 0 ) ? alignment : 1;
             running = false;
