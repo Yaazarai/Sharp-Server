@@ -19,7 +19,7 @@ namespace SharpServer.Sockets {
         /// <summary>
         /// Collection of all existing client connections by key-pair: <socket ID, TcpClientHandler>.
         /// </summary>
-		public Dictionary<int,TcpClientHandler> ClientMap { get; private set; }
+        public Dictionary<int,TcpClientHandler> ClientMap { get; private set; }
         /// <summary>
         /// Maximum number clients to be allowed before more client connections are denied.
         /// </summary>
@@ -40,7 +40,7 @@ namespace SharpServer.Sockets {
         /// Port number to listen for client connections on.
         /// </summary>
         public int Port { get; private set; }
-		/// <summary>
+        /// <summary>
         /// Status (online = true/offline = false) of the TCP server.
         /// </summary>
         public bool Status { get; set; }
@@ -49,15 +49,15 @@ namespace SharpServer.Sockets {
         /// Event handler for any basic server events.
         /// </summary>
         /// <param name="host">TCP server that threw the event.</param>
-		public delegate void ServerEventDelegate( TcpServerHandler host );
-		/// <summary>
-		/// Event thrown when the TCP server starts.
-		/// </summary>
+        public delegate void ServerEventDelegate( TcpServerHandler host );
+        /// <summary>
+        /// Event thrown when the TCP server starts.
+        /// </summary>
         public event ServerEventDelegate StartedDelegate;
         /// <summary>
         /// Event thrown when the TCP server closes.
         /// </summary>
-		public event ServerEventDelegate ClosedDelegate;
+        public event ServerEventDelegate ClosedDelegate;
 
         /// <summary>
         /// Event handler for when the server receives a packet from a client.
@@ -65,20 +65,20 @@ namespace SharpServer.Sockets {
         /// <param name="server">Server which received the event.</param>
         /// <param name="client">Client which received the packet.</param>
         /// <param name="readBuffer">BufferStream which holds the received packet.</param>
-		public delegate void ReceivedEventDelegate( TcpServerHandler server, TcpClientHandler client, BufferStream readBuffer );
+        public delegate void ReceivedEventDelegate( TcpServerHandler server, TcpClientHandler client, BufferStream readBuffer );
         /// <summary>
         /// Event thrown when a client receives a packet.
         /// </summary>
         public event ReceivedEventDelegate ReceivedDelegate;
-		/// <summary>
-		/// Event handler for when the server receives a client connection.
-		/// </summary>
-		/// <param name="server">Server which received the event.</param>
-		/// <param name="client">Client which requests a server connection.</param>
+        /// <summary>
+        /// Event handler for when the server receives a client connection.
+        /// </summary>
+        /// <param name="server">Server which received the event.</param>
+        /// <param name="client">Client which requests a server connection.</param>
         public delegate void ConnectionEventDelegate( TcpServerHandler server, TcpClientHandler client );
-		/// <summary>
-		/// Event thrown when a client requests a connection to the server.
-		/// </summary>
+        /// <summary>
+        /// Event thrown when a client requests a connection to the server.
+        /// </summary>
         public event ConnectionEventDelegate ConnectedDelegate;
         /// <summary>
         /// Event thrown when the server attempts to check an ambiguous client connection.
@@ -236,7 +236,7 @@ namespace SharpServer.Sockets {
         /// Closes the TCP server and unbinds it's socket.
         /// </summary>
         public void Close() {
-			Status = false;
+            Status = false;
             System.GC.SuppressFinalize( this );
         }
 
