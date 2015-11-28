@@ -5,17 +5,17 @@ namespace SharpServer.Sockets {
     /// Provides an implementation for handling client connections on a TCP server.
     /// </summary>
     public class TcpClientHandler : SocketContainer {
-		/// <summary>
-		/// Gets TCP server this client connection belongs too.
-		/// </summary>
+        /// <summary>
+        /// Gets TCP server this client connection belongs too.
+        /// </summary>
         public TcpServerHandler Server { get; private set; }
         /// <summary>
         /// Gest the TCP client that handles this client connection.
         /// </summary>
         public TcpClient Receiver { get; set; }
-		/// <summary>
-		/// NetworkStream that handles incoming and outgoing data.
-		/// </summary>
+        /// <summary>
+        /// NetworkStream that handles incoming and outgoing data.
+        /// </summary>
         public NetworkStream Stream { get; set; }
         /// <summary>
         /// Gets/Sets the online status of this client connection.
@@ -27,23 +27,23 @@ namespace SharpServer.Sockets {
         /// </summary>
         /// <param name="binder">SocketBinder to bind the client's new socket too.</param>
         /// <param name="server">TcpServerHandler this client connection belongs too.</param>
-		public TcpClientHandler( SocketBinder binder, TcpServerHandler server ) : base( binder ) {
-			Server = server;
+        public TcpClientHandler( SocketBinder binder, TcpServerHandler server ) : base( binder ) {
+            Server = server;
             Receiver = null;
-			Stream = null;
-		}
+            Stream = null;
+        }
 
         /// <summary>
         /// Closes this TCP client connection and unbinds it's socket.
         /// </summary>
-		public void Close() {
-			if ( IsBound ) {
+        public void Close() {
+            if ( IsBound ) {
                 Unbind();
-			}
+            }
 
             if ( Receiver != null ) {
                 Receiver.Close();
-				Receiver = null;
+                Receiver = null;
             }
 
             if ( Stream != null ) {
@@ -51,13 +51,13 @@ namespace SharpServer.Sockets {
             }
 
             System.GC.SuppressFinalize( this );
-		}
+        }
 
         /// <summary>
         /// Cleans up and closes this client connection if it hasn't been done already.
         /// </summary>
-		~TcpClientHandler() {
-			Close();
-		}
+        ~TcpClientHandler() {
+            Close();
+        }
     }
 }
