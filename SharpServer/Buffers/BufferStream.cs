@@ -345,72 +345,139 @@ namespace SharpServer.Buffers {
         }
 
         /// <summary>
-        /// Reads the specified type from the buffer.
+        /// Reads the value of the specified type from the buffer.
         /// </summary>
-        /// <param name="type">Type to read from the buffer.</param>
-        /// <param name="length">(optional) Length of the type (bytep[] only).</param>
-        /// <returns>Returns the value of the type read from the buffer.</returns>
+        /// <param name="value">The OUT variable to store the BOOL value in.</param>
         /// <exception cref="System.IndexOutOfRangeException"/>
-        public object Read( BufferType type, int length = 0 ) {
-            object value = null;
+        public void Read( out bool value ) {
+            value = memory[ iterator++ ] >= 0;
+            iterator = ( iterator + fastAlign ) & fastAlignNot;
+        }
 
-            switch( type ) {
-                case BufferType.Bool:
-                    value = memory[ iterator ] >= 0;
-                    iterator += (int)BufferTypeSize.Bool;
-                break;
-                case BufferType.Byte:
-                    value = memory[ iterator ];
-                    iterator += (int)BufferTypeSize.Byte;
-                break;
-                case BufferType.SByte:
-                    value = (sbyte)memory[ iterator ];
-                    iterator += (int)BufferTypeSize.SByte;
-                break;
-                case BufferType.UInt16:
-                    value = BitConverter.ToUInt16( memory, iterator );
-                    iterator += (int)BufferTypeSize.UInt16;
-                break;
-                case BufferType.Int16:
-                    value = BitConverter.ToInt16( memory, iterator );
-                    iterator += (int)BufferTypeSize.Int16;
-                break;
-                case BufferType.UInt32:
-                    value = BitConverter.ToUInt32( memory, iterator );
-                    iterator += (int)BufferTypeSize.UInt32;
-                break;
-                case BufferType.Int32:
-                    value = BitConverter.ToInt32( memory, iterator );
-                    iterator += (int)BufferTypeSize.Int32;
-                break;
-                case BufferType.Single:
-                    value = BitConverter.ToSingle( memory, iterator );
-                    iterator += (int)BufferTypeSize.Single;
-                break;
-                case BufferType.Double:
-                    value = BitConverter.ToDouble( memory, iterator );
-                    iterator += (int)BufferTypeSize.Double;
-                break;
-                case BufferType.String:
-                    StringBuilder str = new StringBuilder();
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the BYTE value in.</param>
+        /// /// <exception cref="System.IndexOutOfRangeException"/>
+        public void Read( out byte value ) {
+            value = memory[ iterator++ ];
+            iterator = ( iterator + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the SBYTE value in.</param>
+        /// <exception cref="System.IndexOutOfRangeException"/>
+        public void Read( out sbyte value ) {
+            value = (sbyte)memory[ iterator++ ];
+            iterator = ( iterator + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the USHORT value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out ushort value ) {
+            value = BitConverter.ToUInt16( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.UInt16 + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the SHORT value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out short value ) {
+            value = BitConverter.ToInt16( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.Int16 + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the UINT value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out uint value ) {
+            value = BitConverter.ToUInt32( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.Int32 + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the INT value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out int value ) {
+            value = BitConverter.ToInt32( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.Int32 + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the FLOAT value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out float value ) {
+            value = BitConverter.ToSingle( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.Single + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the DOUBLE value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out double value ) {
+            value = BitConverter.ToUInt16( memory, iterator );
+            iterator = ( iterator + (int)BufferTypeSize.Double + fastAlign ) & fastAlignNot;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the BYTE[] value in.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out string value ) {
+            StringBuilder str = new StringBuilder();
                     
-                    for( char c = '\0'; iterator < length; ) {
-                        c = (char)memory[ iterator++ ];
-                        if ( c == '\0' ) break;
-                        str.Append( c );
-                    }
-
-                    value = str.ToString();
-                break;
-                case BufferType.Bytes:
-                    byte[] bytes = new byte[ length ];
-                    for( int i = 0; i < length; i++ ) bytes[ i ] = memory[ iterator ++ ];
-                    value = bytes;
-                break;
+            for( char c = '\0'; iterator < length; ) {
+                c = (char)memory[ iterator++ ];
+                if ( c == '\0' ) break;
+                str.Append( c );
             }
 
+            value = str.ToString();
             iterator = ( iterator + fastAlign ) & fastAlignNot;
-            return value;
+        }
+
+        /// <summary>
+        /// Reads the value of the specified type from the buffer.
+        /// </summary>
+        /// <param name="value">The OUT variable to store the BYTE[] value in.</param>
+        /// <param name="length">Number of bytes to read.</param>
+        /// <exception cref="System.ArgumentException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
+        public void Read( out byte[] value, int length ) {
+            value = new byte[ length ];
+            for( int i = 0; i < length; i++ ) value[ i ] = memory[ iterator ++ ];
+            iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
         /// <summary>
