@@ -41,7 +41,7 @@
     <Compile Include="Buffers\BufferStream.cs" />
     <Compile Include="Buffers\PacketStream.cs" />
     <Compile Include="Exceptions\SocketExceptions.cs" />
-    <Compile Include="Servicers\IPServer.cs" />
+    <Compile Include="Servicers\IPServicer.cs" />
     <Compile Include="Servicers\WebTimeoutClient.cs">
       <SubType>Component</SubType>
     </Compile>

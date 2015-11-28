@@ -61,7 +61,7 @@ namespace SharpServer.Buffers {
         }
 
         /// <summary>
-        /// (Forced Inline) Takes an iterator and aligns it to the specified alignment size.
+        /// (forced inline) Takes an iterator and aligns it to the specified alignment size.
         /// </summary>
         /// <param name="iterator">Read/write position.</param>
         /// <param name="alignment">Size in bytes to align the iterator too.</param>
@@ -69,6 +69,51 @@ namespace SharpServer.Buffers {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public int AlignedIterator( int iterator, int alignment ) {
             return ( ( iterator + ( alignment - 1 ) ) & ~( alignment - 1 ) );
+        }
+
+        /// <summary>
+        /// (forced inline) Checks if the specified index with the specified length in bytes is within bounds of the buffer.
+        /// </summary>
+        /// <param name="iterator">Read/write position.</param>
+        /// <param name="length">Index to check the bounds of.</param>
+        /// <param name="alignment">Size in bytes to align the iterator too.</param>
+        /// <returns></returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool IsWithinMemoryBounds( int iterator, int length, bool align = true ) {
+            int iterBegin = ( align ) ? ( ( iterator + fastAlign ) & fastAlignNot ) : iterator;
+            int iterEnd = iterBegin + length;
+            return ( iterBegin < 0 || iterEnd >= length );
+        }
+
+        /// <summary>
+        /// (forced inline) Returns the size of the specified type uspported by BufferStream.
+        /// </summary>
+        /// <param name="type">Type to get the size of.</param>
+        /// <returns>Returns size of the specified type.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public int SizeFromType( BufferType type ) {
+            switch( type ) {
+                case BufferType.Bool:
+                    return (int)BufferTypeSize.Bool;
+                case BufferType.Byte:
+                    return (int)BufferTypeSize.Byte;
+                case BufferType.SByte:
+                    return (int)BufferTypeSize.SByte;
+                case BufferType.UInt16:
+                    return (int)BufferTypeSize.UInt16;
+                case BufferType.Int16:
+                    return (int)BufferTypeSize.Int16;
+                case BufferType.UInt32:
+                    return (int)BufferTypeSize.UInt32;
+                case BufferType.Int32:
+                    return (int)BufferTypeSize.Int32;
+                case BufferType.Single:
+                    return (int)BufferTypeSize.Single;
+                case BufferType.Double:
+                    return (int)BufferTypeSize.Double;
+                default:
+                    return (int) BufferTypeSize.None;
+            }
         }
 
         /// <summary>
@@ -183,7 +228,7 @@ namespace SharpServer.Buffers {
         /// <param name="value">BOOLEAN value to be written.</param>
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( bool value ) {
-            memory[ iterator ] = ( value ) ? bTrue : bFalse;
+            memory[ iterator++ ] = ( value ) ? bTrue : bFalse;
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -193,7 +238,7 @@ namespace SharpServer.Buffers {
         /// <param name="value">BYTE value to be written.</param>
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( byte value ) {
-            memory[ iterator ] = value;
+            memory[ iterator++ ] = value;
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -203,7 +248,7 @@ namespace SharpServer.Buffers {
         /// <param name="value">SBYTE value to be written.</param>
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( sbyte value ) {
-            memory[ iterator ] = (byte)value;
+            memory[ iterator++ ] = (byte)value;
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -214,7 +259,7 @@ namespace SharpServer.Buffers {
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( ushort value ) {
             memory[ iterator++ ] = (byte)value;
-            memory[ iterator ] = (byte)( value >> 8 );
+            memory[ iterator++ ] = (byte)( value >> 8 );
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -225,7 +270,7 @@ namespace SharpServer.Buffers {
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( short value ) {
             memory[ iterator++ ] = (byte)value;
-            memory[ iterator ] = (byte)( value >> 8 );
+            memory[ iterator++ ] = (byte)( value >> 8 );
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -238,7 +283,7 @@ namespace SharpServer.Buffers {
             memory[ iterator++ ] = (byte)value;
             memory[ iterator++ ] = (byte)( value >> 8 );
             memory[ iterator++ ] = (byte)( value >> 16 );
-            memory[ iterator ] = (byte)( value >> 24 );
+            memory[ iterator++ ] = (byte)( value >> 24 );
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -251,7 +296,7 @@ namespace SharpServer.Buffers {
             memory[ iterator++ ] = (byte)value;
             memory[ iterator++ ] = (byte)( value >> 8 );
             memory[ iterator++ ] = (byte)( value >> 16 );
-            memory[ iterator ] = (byte)( value >> 24 );
+            memory[ iterator++ ] = (byte)( value >> 24 );
             iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
@@ -300,94 +345,6 @@ namespace SharpServer.Buffers {
         }
 
         /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">BOOL value to be written.</param>
-        public void WriteSafe( bool value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Bool ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">BYTE value to be written.</param>
-        public void WriteSafe( byte value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Byte ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">SBYTE value to be written.</param>
-        public void WriteSafe( sbyte value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.SByte ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">USHORT value to be written.</param>
-        public void WriteSafe( ushort value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.UInt16 ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">SHORT value to be written.</param>
-        public void WriteSafe( short value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Int16 ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">UINT value to be written.</param>
-        public void WriteSafe( uint value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.UInt32 ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">INT value to be written.</param>
-        public void WriteSafe( int value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Int32 ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">FLOAT value to be written.</param>
-        public void WriteSafe( float value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Single ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">DOUBLE value to be written.</param>
-        public void WriteSafe( double value ) {
-            if ( iterator >= 0 && iterator < ( length + (int)BufferTypeSize.Double ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">STRING value to be written.</param>
-        public void WriteSafe( string value ) {
-            if ( iterator >= 0 && iterator < ( length + value.Length + 1 ) ) Write( value );
-        }
-
-        /// <summary>
-        /// Writes a value of the specified type to this buffer if the whole type can fit in the buffer.
-        /// </summary>
-        /// <param name="value">BYTE[] array to be written.</param>
-        public void WriteSafe( byte[] value ) {
-            if ( iterator >= 0 && iterator < ( length + value.Length ) ) Write( value );
-        }
-
-        /// <summary>
         /// Reads the specified type from the buffer.
         /// </summary>
         /// <param name="type">Type to read from the buffer.</param>
@@ -399,14 +356,15 @@ namespace SharpServer.Buffers {
 
             switch( type ) {
                 case BufferType.Bool:
-                    value = BitConverter.ToBoolean( memory, iterator++ );
+                    value = memory[ iterator ] >= 0;
+                    iterator += (int)BufferTypeSize.Bool;
                 break;
                 case BufferType.Byte:
-                    value = memory[ iterator++ ];
+                    value = memory[ iterator ];
                     iterator += (int)BufferTypeSize.Byte;
                 break;
                 case BufferType.SByte:
-                    value = (sbyte)memory[ iterator++ ];
+                    value = (sbyte)memory[ iterator ];
                     iterator += (int)BufferTypeSize.SByte;
                 break;
                 case BufferType.UInt16:
@@ -456,70 +414,20 @@ namespace SharpServer.Buffers {
         }
 
         /// <summary>
-        /// Reads the specified type from the buffer if the read position would nto go out of bounds by reading the specified type.
-        /// </summary>
-        /// <param name="type">Type to read from the buffer.</param>
-        /// <param name="length">(optional) Length of the type (bytep[] only).</param>
-        /// <returns>Returns the value of the type read from the buffer.</returns>
-        public object ReadSafe( BufferType type, int length = 0 ) {
-            if ( ( type == BufferType.Bytes && ( length == 0 || iterator + length >= this.length ) ) || ( iterator >= this.length || iterator <= 0 ) ) {
-                return null;
-            }
-
-            int size = SizeFromType( type );
-
-            if ( type != BufferType.String && iterator >= this.length - size ) {
-                return null;
-            }
-
-            return Read( type, length );
-        }
-
-        /// <summary>
         /// Sets the iterator(read/write position) to the specified index, aligned to this buffer's alignment.
         /// </summary>
-        /// <param name="index">Index to set the iterator to.</param>
-        public void Seek( int index ) {
-            iterator = ( index + fastAlign ) & fastAlignNot;
+        /// <param name="iterator">Index to set the iterator to.</param>
+        public void Seek( int iterator ) {
+            this.iterator = ( iterator + fastAlign ) & fastAlignNot;
         }
 
         /// <summary>
         /// Sets the iterator(read/write position) to the specified index, aligned to this buffer's alignment if alignment is specified as true.
         /// </summary>
-        /// <param name="index">Index to set the iterator to.</param>
+        /// <param name="iterator">Index to set the iterator to.</param>
         /// <param name="align">Whether to align the iterator or not.</param>
-        public void Seek( int index, bool align = false ) {
-            iterator = ( align ) ? ( iterator + fastAlign ) & fastAlignNot : index;
-        }
-
-        /// <summary>
-        /// Returns the size of the specified type uspported by BufferStream.
-        /// </summary>
-        /// <param name="type">Type to get the size of.</param>
-        /// <returns>Returns size of the specified type.</returns>
-        private int SizeFromType( BufferType type ) {
-            switch( type ) {
-                case BufferType.Bool:
-                    return (int)BufferTypeSize.Bool;
-                case BufferType.Byte:
-                    return (int)BufferTypeSize.Byte;
-                case BufferType.SByte:
-                    return (int)BufferTypeSize.SByte;
-                case BufferType.UInt16:
-                    return (int)BufferTypeSize.UInt16;
-                case BufferType.Int16:
-                    return (int)BufferTypeSize.Int16;
-                case BufferType.UInt32:
-                    return (int)BufferTypeSize.UInt32;
-                case BufferType.Int32:
-                    return (int)BufferTypeSize.Int32;
-                case BufferType.Single:
-                    return (int)BufferTypeSize.Single;
-                case BufferType.Double:
-                    return (int)BufferTypeSize.Double;
-                default:
-                    return (int) BufferTypeSize.None;
-            }
+        public void Seek( int iterator, bool align = false ) {
+            this.iterator = ( align ) ? ( iterator + fastAlign ) & fastAlignNot : iterator;
         }
     }
 }
