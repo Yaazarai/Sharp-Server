@@ -7,24 +7,6 @@ using Array = System.Array;
 
 namespace SharpServer.Buffers {
     /// <summary>
-    /// Enumerator that represents the different support datatypes of the BufferStream class.
-    /// </summary>
-    public enum BufferType {
-        None, Bool, Byte, SByte,
-        UInt16, Int16, UInt32, Int32,
-        Single, Double, String, Bytes
-    }
-
-    /// <summary>
-    /// Enumerator that represents the size of each datatype supported by the BufferStream class.
-    /// </summary>
-    public enum BufferTypeSize {
-        None = 0, Bool = 1, Byte = 1, SByte = 1,
-        UInt16 = 2, Int16 = 2, UInt32 = 4, Int32 = 4,
-        Single = 4, Double = 8, String = -1, Bytes = -1
-    }
-
-    /// <summary>
     /// Provides a stream designed for reading TCP packets and UDP datagrams by type.
     /// </summary>
     public class BufferStream {
@@ -83,37 +65,6 @@ namespace SharpServer.Buffers {
             int iterBegin = ( align ) ? ( ( iterator + fastAlign ) & fastAlignNot ) : iterator;
             int iterEnd = iterBegin + length;
             return ( iterBegin < 0 || iterEnd >= length );
-        }
-
-        /// <summary>
-        /// (forced inline) Returns the size of the specified type uspported by BufferStream.
-        /// </summary>
-        /// <param name="type">Type to get the size of.</param>
-        /// <returns>Returns size of the specified type.</returns>
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public int SizeFromType( BufferType type ) {
-            switch( type ) {
-                case BufferType.Bool:
-                    return (int)BufferTypeSize.Bool;
-                case BufferType.Byte:
-                    return (int)BufferTypeSize.Byte;
-                case BufferType.SByte:
-                    return (int)BufferTypeSize.SByte;
-                case BufferType.UInt16:
-                    return (int)BufferTypeSize.UInt16;
-                case BufferType.Int16:
-                    return (int)BufferTypeSize.Int16;
-                case BufferType.UInt32:
-                    return (int)BufferTypeSize.UInt32;
-                case BufferType.Int32:
-                    return (int)BufferTypeSize.Int32;
-                case BufferType.Single:
-                    return (int)BufferTypeSize.Single;
-                case BufferType.Double:
-                    return (int)BufferTypeSize.Double;
-                default:
-                    return (int) BufferTypeSize.None;
-            }
         }
 
         /// <summary>
