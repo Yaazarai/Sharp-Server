@@ -49,11 +49,11 @@ namespace SharpServer.Sockets {
         /// <summary>
         /// Event thrown when the TCP server starts.
         /// </summary>
-        public event ServerEventDelegate StartedDelegate;
+        public event ServerEventDelegate StartedEvent;
         /// <summary>
         /// Event thrown when the TCP server closes.
         /// </summary>
-        public event ServerEventDelegate ClosedDelegate;
+        public event ServerEventDelegate ClosedEvent;
 
         /// <summary>
         /// Event handler for when the server receives a packet from a client.
@@ -65,7 +65,7 @@ namespace SharpServer.Sockets {
         /// <summary>
         /// Event thrown when a client receives a packet.
         /// </summary>
-        public event ReceivedEventDelegate ReceivedDelegate;
+        public event ReceivedEventDelegate ReceivedEvent;
         /// <summary>
         /// Event handler for when the server receives a client connection.
         /// </summary>
@@ -75,19 +75,19 @@ namespace SharpServer.Sockets {
         /// <summary>
         /// Event thrown when a client requests a connection to the server.
         /// </summary>
-        public event ConnectionEventDelegate ConnectedDelegate;
+        public event ConnectionEventDelegate ConnectedEvent;
         /// <summary>
         /// Event thrown when the server attempts to check an ambiguous client connection.
         /// </summary>
-        public event ConnectionEventDelegate AttemptReconnectDelegate;
+        public event ConnectionEventDelegate AttemptReconnectEvent;
         /// <summary>
         /// Event thrown when the client requests a connection, but the server has already reached maximum client connections.
         /// </summary>
-        public event ConnectionEventDelegate ClientOverflowDelegate;
+        public event ConnectionEventDelegate ClientOverflowEvent;
         /// <summary>
         /// Event to be thrown when a client disconnections from the server.
         /// </summary>
-        public event ConnectionEventDelegate DisconnectedDelegate;
+        public event ConnectionEventDelegate DisconnectedEvent;
 
         /// <summary>
         /// Instantiates an instance of the TcpServerHandler class with the specified SocketBinder and setup parameters.
@@ -176,7 +176,7 @@ namespace SharpServer.Sockets {
         /// </summary>
         private void Accept() {
             running = true;
-            if ( StartedDelegate != null ) StartedDelegate( this );
+            if ( StartedEvent != null ) StartedEvent( this );
 
             while( Status ) {
                 if ( !Listener.Pending() ) continue;
@@ -193,12 +193,12 @@ namespace SharpServer.Sockets {
                     ClientMap.Add( client.Socket, client );
                     ThreadPool.QueueUserWorkItem( thread => Handle( client ) );
                 } else {
-                    if ( ClientOverflowDelegate != null ) ThreadPool.QueueUserWorkItem( thread => ClientOverflowDelegate( this, client ) );
+                    if ( ClientOverflowEvent != null ) ThreadPool.QueueUserWorkItem( thread => ClientOverflowEvent( this, client ) );
                     client.Close();
                 }
             }
 
-            if ( ClosedDelegate != null )  ClosedDelegate( this );
+            if ( ClosedEvent != null )  ClosedEvent( this );
             running = false;
             Close();
         }
@@ -208,11 +208,11 @@ namespace SharpServer.Sockets {
         /// </summary>
         /// <param name="client"></param>
         private void Handle( TcpClientHandler client ) {
-            if ( ConnectedDelegate != null ) ConnectedDelegate( this, client );
+            if ( ConnectedEvent != null ) ConnectedEvent( this, client );
 
             while( client.Connected ) {
                 if ( !client.Receiver.Connected ) {
-                    if ( AttemptReconnectDelegate != null ) AttemptReconnectDelegate( this, client );
+                    if ( AttemptReconnectEvent != null ) AttemptReconnectEvent( this, client );
                     client.Connected = client.Receiver.Connected;
                 }
 
@@ -220,11 +220,11 @@ namespace SharpServer.Sockets {
                     int packet = client.Receiver.Available;
                     BufferStream buffer = new BufferStream( packet, 1 );
                     client.Stream.Read( buffer.Memory, 0, packet );
-                    if ( ReceivedDelegate != null ) ReceivedDelegate( this, client, buffer );
+                    if ( ReceivedEvent != null ) ReceivedEvent( this, client, buffer );
                 }
             }
 
-            if ( DisconnectedDelegate != null ) DisconnectedDelegate( this, client );
+            if ( DisconnectedEvent != null ) DisconnectedEvent( this, client );
         }
 
         /// <summary>

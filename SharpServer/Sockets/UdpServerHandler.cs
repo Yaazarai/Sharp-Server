@@ -51,15 +51,15 @@ namespace SharpServer.Sockets {
         /// <summary>
         /// Event thrown when the UDP server is started.
         /// </summary>
-        public event StartedEventDelegate StartedDelegate;
+        public event StartedEventDelegate StartedEvent;
         /// <summary>
         /// Event thrown when the UDP server receives a datagram.
         /// </summary>
-        public event ReceivedEventDelegate ReceivedDelegate;
+        public event ReceivedEventDelegate ReceivedEvent;
         /// <summary>
         /// Event thrown when the UDP server closes.
         /// </summary>
-        public event ClosedEventDelegate ClosedDelegate;
+        public event ClosedEventDelegate ClosedEvent;
 		
         /// <summary>
         /// Instantiates an instances of the UdpServerHandler class using the specified SocketBinder and parameters.
@@ -109,7 +109,7 @@ namespace SharpServer.Sockets {
         /// </summary>
         private void Handle() {
             running = true;
-            StartedDelegate( this );
+            StartedEvent( this );
 
             while( Status ) {
                 if ( Listener.Available > 0 ) {
@@ -120,11 +120,11 @@ namespace SharpServer.Sockets {
 
                     BufferStream readBuffer = new BufferStream( length, Alignment );
                     System.Array.Copy( datagram, 0, readBuffer.Memory, 0, length );
-                    ThreadPool.QueueUserWorkItem( thread => ReceivedDelegate( this, readBuffer, endPoint ) );
+                    ThreadPool.QueueUserWorkItem( thread => ReceivedEvent( this, readBuffer, endPoint ) );
                 }
             }
 
-            ClosedDelegate( this );
+            ClosedEvent( this );
             running = false;
             Close();
         }
