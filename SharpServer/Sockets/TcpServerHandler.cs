@@ -54,6 +54,15 @@ namespace SharpServer.Sockets {
         /// Event thrown when the TCP server closes.
         /// </summary>
         public event ServerEventDelegate ClosedEvent;
+        /// <summary>
+        /// Event handler for when the server creates a new client.
+        /// </summary>
+        /// <returns>Returns a new TcpClientHandler when a client is connected.</returns>
+        public delegate TcpClientHandler ClientCreatedEventDelegate( SocketBinder binder, TcpServerHandler server );
+        /// <summary>
+        /// Event thrown when the server creates a client.
+        /// </summary>
+        public event ClientCreatedEventDelegate ClientCreateEvent;
 
         /// <summary>
         /// Event handler for when the server receives a packet from a client.
@@ -181,7 +190,7 @@ namespace SharpServer.Sockets {
             while( Status ) {
                 if ( !Listener.Pending() ) continue;
 
-                TcpClientHandler client = new TcpClientHandler( Binder, this );
+                TcpClientHandler client = ( ClientCreateEvent != null ) ? ClientCreateEvent( Binder, this ) : new TcpClientHandler( Binder, this );
                 client.Receiver = Listener.AcceptTcpClient();
                 client.Connected = true;
 
