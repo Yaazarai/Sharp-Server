@@ -21,13 +21,15 @@ namespace SharpServer.Sockets {
         /// Gets/Sets the online status of this client connection.
         /// </summary>
         public bool Connected { get; set; }
+        
+        public uint Timeout { get; set; }
 
         /// <summary>
         /// Instantiates an instance of the TcpClientHandler class with the specified SocketBinder and parent TcpServerHandler.
         /// </summary>
         /// <param name="binder">SocketBinder to bind the client's new socket too.</param>
         /// <param name="server">TcpServerHandler this client connection belongs too.</param>
-        public TcpClientHandler( SocketBinder binder, TcpServerHandler server ) : base( binder ) {
+        public TcpClientHandler( SocketBinder binder, TcpServerHandler server, uint timeout ) : base( binder ) {
             Server = server;
             Receiver = null;
             Stream = null;

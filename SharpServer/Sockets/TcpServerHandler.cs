@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Diagnostics;
 using SharpServer.Exceptions;
 using SharpServer.Buffers;
 
@@ -42,6 +43,11 @@ namespace SharpServer.Sockets {
         public bool Status { get; set; }
 
         /// <summary>
+        /// Number of milliseconds that have to pass before the client check's it's connection status.
+        /// </summary>
+        public uint ClientTimeout { get; set; }
+
+        /// <summary>
         /// Event handler for any basic server events.
         /// </summary>
         /// <param name="host">TCP server that threw the event.</param>
@@ -58,7 +64,7 @@ namespace SharpServer.Sockets {
         /// Event handler for when the server creates a new client.
         /// </summary>
         /// <returns>Returns a new TcpClientHandler when a client is connected.</returns>
-        public delegate TcpClientHandler ClientCreatedEventDelegate( SocketBinder binder, TcpServerHandler server );
+        public delegate TcpClientHandler ClientCreatedEventDelegate( SocketBinder binder, TcpServerHandler server, uint ClientTimeout );
         /// <summary>
         /// Event thrown when the server creates a client.
         /// </summary>
@@ -107,7 +113,7 @@ namespace SharpServer.Sockets {
         /// <param name="alignment">Default alignment for receive buffers.</param>
         /// <param name="packetHeader">Collection of bytes used for packet verification.</param>
         /// <param name="ip">IP address to listen on--or NULL to listen on all available IP addresses on this device.</param>
-        public TcpServerHandler( SocketBinder binder, int port, int maxConnections, int alignment, IPAddress ip = null ) : base( binder ) {
+        public TcpServerHandler( SocketBinder binder, int port, int maxConnections, int alignment, uint clientTimeout, IPAddress ip = null ) : base( binder ) {
             if ( maxConnections > 0 ) {
                 MaxConnections = maxConnections;
                 ClientMap = new Dictionary<int,TcpClientHandler>( maxConnections );
@@ -118,6 +124,7 @@ namespace SharpServer.Sockets {
 
             Port = port;
             Alignment = alignment;
+            ClientTimeout = clientTimeout;
 
             BeginSetup( port, ip );
         }
@@ -190,7 +197,7 @@ namespace SharpServer.Sockets {
             while( Status ) {
                 if ( !Listener.Pending() ) continue;
 
-                TcpClientHandler client = ( ClientCreateEvent != null ) ? ClientCreateEvent( Binder, this ) : new TcpClientHandler( Binder, this );
+                TcpClientHandler client = ( ClientCreateEvent != null ) ? ClientCreateEvent( Binder, this, ClientTimeout ) : new TcpClientHandler( Binder, this, ClientTimeout );
                 client.Receiver = Listener.AcceptTcpClient();
                 client.Connected = true;
 
@@ -219,10 +226,14 @@ namespace SharpServer.Sockets {
         private void Handle( TcpClientHandler client ) {
             if ( ConnectedEvent != null ) ConnectedEvent( client );
 
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             while( client.Connected ) {
-                if ( !client.Receiver.Connected ) {
+                if ( watch.ElapsedMilliseconds >= client.Timeout ) {
                     if ( AttemptReconnectEvent != null ) AttemptReconnectEvent( client );
                     client.Connected = client.Receiver.Connected;
+                    watch.Reset();
                 }
 
                 if ( client.Stream.DataAvailable ) {
