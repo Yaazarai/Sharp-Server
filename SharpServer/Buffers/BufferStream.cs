@@ -7,6 +7,15 @@ using Array = System.Array;
 
 namespace SharpServer.Buffers {
     /// <summary>
+    /// Enumerator that represents the size of each datatype supported by the BufferStream class.
+    /// </summary>
+    public enum BufferTypeSize {
+        None = 0, Bool = 1, Byte = 1, SByte = 1,
+        UInt16 = 2, Int16 = 2, UInt32 = 4, Int32 = 4,
+        Single = 4, Double = 8, String = -1, Bytes = -1
+    }
+    
+    /// <summary>
     /// Provides a stream designed for reading TCP packets and UDP datagrams by type.
     /// </summary>
     public class BufferStream {
