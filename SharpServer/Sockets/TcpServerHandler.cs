@@ -64,7 +64,7 @@ namespace SharpServer.Sockets {
         /// Event handler for when the server creates a new client.
         /// </summary>
         /// <returns>Returns a new TcpClientHandler when a client is connected.</returns>
-        public delegate TcpClientHandler ClientCreatedEventDelegate( SocketBinder binder, TcpServerHandler server, uint ClientTimeout );
+        public delegate TcpClientHandler ClientCreatedEventDelegate( SocketBinder binder, TcpServerHandler server, uint clientTimeout );
         /// <summary>
         /// Event thrown when the server creates a client.
         /// </summary>
