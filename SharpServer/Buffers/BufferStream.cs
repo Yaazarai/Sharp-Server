@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using Encoding = System.Text.Encoding;
 using StringBuilder = System.Text.StringBuilder;
 using BitConverter = System.BitConverter;
 using Array = System.Array;
@@ -288,7 +289,7 @@ namespace SharpServer.Buffers {
         /// <param name="value">STRING value to be written.</param>
         /// <exception cref="System.IndexOutOfRangeException"/>
         public void Write( string value ) {
-            byte[] bytes = System.Text.Encoding.ASCII.GetBytes( (string)value );
+            byte[] bytes = Encoding.ASCII.GetBytes( (string)value );
             for( int i = 0; i < bytes.Length; i++ ) { memory[ iterator++ ] = bytes[ i ]; }
             memory[ iterator++ ] = 0;
             iterator = ( iterator + fastAlign ) & fastAlignNot;
