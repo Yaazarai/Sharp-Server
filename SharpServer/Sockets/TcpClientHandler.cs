@@ -31,6 +31,7 @@ namespace SharpServer.Sockets {
         /// <param name="server">TcpServerHandler this client connection belongs too.</param>
         public TcpClientHandler( SocketBinder binder, TcpServerHandler server, uint timeout ) : base( binder ) {
             Server = server;
+            Timeout = timeout;
             Receiver = null;
             Stream = null;
         }
