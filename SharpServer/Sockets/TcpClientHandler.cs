@@ -21,7 +21,9 @@ namespace SharpServer.Sockets {
         /// Gets/Sets the online status of this client connection.
         /// </summary>
         public bool Connected { get; set; }
-        
+        /// <summary>
+        /// Amount of time in milliseconds that has to pass for the client to timeout.
+        /// </summary>
         public uint Timeout { get; set; }
 
         /// <summary>

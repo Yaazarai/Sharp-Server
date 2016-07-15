@@ -233,7 +233,6 @@ namespace SharpServer.Sockets {
                 if ( watch.ElapsedMilliseconds >= client.Timeout ) {
                     if ( AttemptReconnectEvent != null ) AttemptReconnectEvent( client );
                     client.Connected = client.Receiver.Connected;
-                    watch.Reset();
                 }
 
                 if ( client.Stream.DataAvailable ) {
@@ -242,9 +241,13 @@ namespace SharpServer.Sockets {
                     client.Stream.Read( buffer.Memory, 0, packet );
                     if ( ReceivedEvent != null ) ReceivedEvent( client, buffer );
                 }
+
+                watch.Reset();
             }
 
             if ( DisconnectedEvent != null ) DisconnectedEvent( client );
+            client.Close();
+            ClientMap.Remove(client.Socket);
         }
 
         /// <summary>
